@@ -18,7 +18,9 @@ ZLIB_SUPPORT = -DCPPHTTPLIB_ZLIB_SUPPORT -lz
 BROTLI_DIR = $(PREFIX)/opt/brotli
 BROTLI_SUPPORT = -DCPPHTTPLIB_BROTLI_SUPPORT -I$(BROTLI_DIR)/include -L$(BROTLI_DIR)/lib -lbrotlicommon -lbrotlienc -lbrotlidec
 
-all: server client hello simplecli simplesvr upload redirect ssesvr ssecli benchmark one_time_request server_and_client accept_header
+UV_SUPPORT = -luv
+
+all: server client hello simplecli simplesvr upload redirect ssesvr ssecli benchmark one_time_request server_and_client accept_header uv_echo_server
 
 server : server.cc ../httplib.h Makefile
 	$(CXX) -o server $(CXXFLAGS) server.cc $(OPENSSL_SUPPORT) $(ZLIB_SUPPORT) $(BROTLI_SUPPORT)
@@ -59,9 +61,12 @@ server_and_client : server_and_client.cc ../httplib.h Makefile
 accept_header : accept_header.cc ../httplib.h Makefile
 	$(CXX) -o accept_header $(CXXFLAGS) accept_header.cc $(OPENSSL_SUPPORT) $(ZLIB_SUPPORT) $(BROTLI_SUPPORT)
 
+uv_echo_server : uv_echo_server.cc ../httplib.h Makefile
+	$(CXX) -o uv_echo_server $(CXXFLAGS) uv_echo_server.cc $(UV_SUPPORT)
+
 pem:
 	openssl genrsa 2048 > key.pem
 	openssl req -new -key key.pem | openssl x509 -days 3650 -req -signkey key.pem > cert.pem
 
 clean:
-	rm server client hello simplecli simplesvr upload redirect ssesvr ssecli benchmark one_time_request server_and_client accept_header *.pem
+	rm -f server client hello simplecli simplesvr upload redirect ssesvr ssecli benchmark one_time_request server_and_client accept_header uv_echo_server *.pem
