@@ -21,7 +21,7 @@ BROTLI_SUPPORT = -DCPPHTTPLIB_BROTLI_SUPPORT -I$(BROTLI_DIR)/include -L$(BROTLI_
 ZSTD_DIR = $(PREFIX)/opt/zstd
 ZSTD_SUPPORT = -DCPPHTTPLIB_ZSTD_SUPPORT -I$(ZSTD_DIR)/include -L$(ZSTD_DIR)/lib -lzstd
 
-LIBS = -lpthread -lcurl
+LIBS = -lpthread
 ifneq ($(OS), Windows_NT)
 	UNAME_S := $(shell uname -s)
 	ifeq ($(UNAME_S), Darwin)
@@ -32,7 +32,7 @@ ifneq ($(OS), Windows_NT)
 	endif
 endif
 
-TEST_ARGS = gtest/src/gtest-all.cc gtest/src/gtest_main.cc -Igtest -Igtest/include $(OPENSSL_SUPPORT) $(ZLIB_SUPPORT) $(BROTLI_SUPPORT) $(ZSTD_SUPPORT) $(LIBS)
+TEST_ARGS = gtest/src/gtest-all.cc gtest/src/gtest_main.cc -Igtest -Igtest/include $(OPENSSL_SUPPORT) $(ZLIB_SUPPORT) $(BROTLI_SUPPORT) $(LIBS)
 
 # By default, use standalone_fuzz_target_runner.
 # This runner does no fuzzing, but simply executes the inputs
@@ -108,7 +108,7 @@ test_proxy : test_proxy.cc ../httplib.h Makefile cert.pem
 	$(CXX) -o $@ -I.. $(CXXFLAGS) test_proxy.cc $(TEST_ARGS)
 
 test_echo_server : test_echo_server.cc ../httplib.h Makefile
-	g++ -o $@ -I.. $(CXXFLAGS) test_echo_server.cc $(OPENSSL_SUPPORT) $(ZLIB_SUPPORT) $(BROTLI_SUPPORT) -lpthread -lanl
+	g++ -o $@ -I.. $(CXXFLAGS) test_echo_server.cc $(TEST_ARGS)
 
 # Runs server_fuzzer.cc based on value of $(LIB_FUZZING_ENGINE).
 # Usage: make fuzz_test LIB_FUZZING_ENGINE=/path/to/libFuzzer
