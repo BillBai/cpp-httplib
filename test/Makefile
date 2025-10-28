@@ -47,8 +47,9 @@ REALPATH = $(shell which grealpath 2>/dev/null || which realpath 2>/dev/null)
 STYLE_CHECK_FILES = $(filter-out httplib.h httplib.cc, \
 	$(wildcard example/*.h example/*.cc fuzzing/*.h fuzzing/*.cc *.h *.cc ../httplib.h))
 
-all : test test_split
+all : test test_split test_echo_server
 	./test
+	./test_echo_server
 
 proxy : test_proxy
 	@echo "Starting proxy server..."
@@ -106,6 +107,9 @@ style_check: $(STYLE_CHECK_FILES)
 test_proxy : test_proxy.cc ../httplib.h Makefile cert.pem
 	$(CXX) -o $@ -I.. $(CXXFLAGS) test_proxy.cc $(TEST_ARGS)
 
+test_echo_server : test_echo_server.cc ../httplib.h Makefile
+	g++ -o $@ -I.. $(CXXFLAGS) test_echo_server.cc $(OPENSSL_SUPPORT) $(ZLIB_SUPPORT) $(BROTLI_SUPPORT) -lpthread -lanl
+
 # Runs server_fuzzer.cc based on value of $(LIB_FUZZING_ENGINE).
 # Usage: make fuzz_test LIB_FUZZING_ENGINE=/path/to/libFuzzer
 fuzz_test: server_fuzzer
@@ -128,5 +132,5 @@ cert.pem:
 	./gen-certs.sh
 
 clean:
-	rm -rf test test_split test_proxy server_fuzzer *.pem *.0 *.o *.1 *.srl httplib.h httplib.cc _build* *.dSYM
+	rm -rf test test_split test_proxy server_fuzzer test_echo_server *.pem *.0 *.o *.1 *.srl httplib.h httplib.cc _build* *.dSYM
 
